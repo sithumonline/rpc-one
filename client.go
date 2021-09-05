@@ -1,9 +1,10 @@
 package main
 
 import (
-	"log"
 	"context"
-	
+	"log"
+	"time"
+
 	"google.golang.org/grpc"
 
 	"github.com/sithumonline/rpc-one/chat"
@@ -29,5 +30,10 @@ func main() {
 	}
 
 	log.Printf("Response from server: %s", res.Body)
+
+	if err == nil {
+		time.Sleep(time.Second * 5)
+		main()
+	}
 
 }
