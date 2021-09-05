@@ -4,6 +4,7 @@ package chat;
 
 message Message {
     string body = 1;
+    int32 count = 2;
 }
 
 service ChatService {

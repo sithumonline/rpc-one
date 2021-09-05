@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -21,7 +22,8 @@ func main() {
 	c := chat.NewChatServiceClient(conn)
 
 	message := chat.Message{
-		Body: "Hello from the client",
+		Body:   "Hello from the client",
+		Count:  100,
 	}
 
 	res, err := c.SayHello(context.Background(), &message)
@@ -31,9 +33,25 @@ func main() {
 
 	log.Printf("Response from server: %s", res.Body)
 
-	if err == nil {
+	for {
 		time.Sleep(time.Second * 5)
-		main()
+		var msg *chat.Message
+		replyBody := fmt.Sprintf("Hello %d from client", res.Count)
+		if res.Count > 200 {
+			msg = &chat.Message{
+				Body:  replyBody,
+				Count: res.Count - 100,
+			}
+		}
+		msg = &chat.Message{
+			Body:  replyBody,
+			Count: res.Count + 10,
+		}
+		res, err = c.SayHello(context.Background(), msg)
+		if err != nil {
+			log.Fatalf("error when calling SayHello at for: %s", err)
+		}
+		log.Printf("Response from server at for: %s", res.Body)
 	}
 
 }
