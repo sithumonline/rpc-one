@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"google.golang.org/grpc"
@@ -13,7 +14,7 @@ import (
 
 func main() {
 	var conn *grpc.ClientConn
-	conn, err := grpc.Dial(":8080", grpc.WithInsecure())
+	conn, err := grpc.Dial(os.Getenv("SERVER"), grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("coud not connect: %s", err)
 	}
@@ -22,8 +23,8 @@ func main() {
 	c := chat.NewChatServiceClient(conn)
 
 	message := chat.Message{
-		Body:   "Hello from the client",
-		Count:  100,
+		Body:  "Hello from the client",
+		Count: 100,
 	}
 
 	res, err := c.SayHello(context.Background(), &message)

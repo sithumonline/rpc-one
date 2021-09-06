@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rpc-server
+  namespace: dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: puso-server
+  template:
+    metadata:
+      labels:
+        run: puso-server
+    spec:
+      containers:
+        - name: go-puso
+          image: ghcr.io/sithumonline/rpc-one-server:latest
+          ports:
+            - containerPort: 8080
+              name: rpc-server-port
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: server-service
+  namespace: dev
+spec:
+  selector:
+    run: puso-server
+  ports:
+    - name: rpc-server-port
+      port: 8080
+      targetPort: rpc-server-port
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rpc-client
+  namespace: dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: puso-client
+  template:
+    metadata:
+      labels:
+        run: puso-client
+    spec:
+      containers:
+        - name: go-puso
+          image: ghcr.io/sithumonline/rpc-one-client:latest
+          env:
+            - name: SERVER
+              value: "server-service.dev.svc:8080"
