@@ -5,6 +5,7 @@ import (
 	"net"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 
 	"github.com/sithumonline/rpc-one/chat"
 )
@@ -21,6 +22,8 @@ func main() {
 
 	chat.RegisterChatServiceServer(grpcServer, &s)
 
+	reflection.Register(grpcServer)
+
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
@@ -28,5 +31,3 @@ func main() {
 	log.Println("Server started on port 8080")
 
 }
-
-//	 protoc --go_out=plugins=grpc:chat chat.proto
